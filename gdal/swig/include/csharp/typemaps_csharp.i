@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id$
+ * $Id: typemaps_csharp.i 33721 2016-03-15 00:56:01Z goatbar $
  *
  * Name:     typemaps_csharp.i
  * Project:  GDAL CSharp Interface
@@ -90,9 +90,9 @@ OGRErrMessages( int rc ) {
 %typemap(out) IF_ERROR_RETURN_NONE %{ $result = $1; %}
 
 %define OPTIONAL_POD(CTYPE, CSTYPE)
-%typemap(imtype) (CTYPE *optional_##CTYPE) "IntPtr"
+%typemap(imtype) (CTYPE *optional_##CTYPE) "global::System.IntPtr"
 %typemap(cstype) (CTYPE *optional_##CTYPE) "ref CSTYPE"
-%typemap(csin) (CTYPE *optional_##CTYPE) "(IntPtr)$csinput"
+%typemap(csin) (CTYPE *optional_##CTYPE) "(global::System.IntPtr)$csinput"
 
 %typemap(in) (CTYPE *optional_##CTYPE)
 {
@@ -143,20 +143,20 @@ OPTIONAL_POD(int, int);
  *****************************************************************************/
 
 %pragma(csharp) imclasscode=%{
-  public class StringListMarshal : IDisposable {
-    public readonly IntPtr[] _ar;
+  public class StringListMarshal : global::System.IDisposable {
+    public readonly global::System.IntPtr[] _ar;
     public StringListMarshal(string[] ar) {
-      _ar = new IntPtr[ar.Length+1];
+      _ar = new global::System.IntPtr[ar.Length+1];
       for (int cx = 0; cx < ar.Length; cx++) {
-	      _ar[cx] = System.Runtime.InteropServices.Marshal.StringToHGlobalAnsi(ar[cx]);
+	      _ar[cx] = global::System.Runtime.InteropServices.Marshal.StringToHGlobalAnsi(ar[cx]);
       }
-      _ar[ar.Length] = IntPtr.Zero;
+      _ar[ar.Length] =global::System.IntPtr.Zero;
     }
     public virtual void Dispose() {
 	  for (int cx = 0; cx < _ar.Length-1; cx++) {
-          System.Runtime.InteropServices.Marshal.FreeHGlobal(_ar[cx]);
+          global::System.Runtime.InteropServices.Marshal.FreeHGlobal(_ar[cx]);
       }
-      GC.SuppressFinalize(this);
+      global::System.GC.SuppressFinalize(this);
     }
   }
 %}
@@ -168,25 +168,25 @@ OPTIONAL_POD(int, int);
 /* FIXME: all those typemaps are not equivalent... out(char **CSL) should free */
 /* the list with CSLDestroy() for example */
 
-%typemap(imtype, out="IntPtr") char **options, char **dict, char **CSL "IntPtr[]"
+%typemap(imtype, out="global::System.IntPtr") char **options, char **dict, char **CSL "global::System.IntPtr[]"
 %typemap(cstype) char **options, char **dict, char **CSL %{string[]%}
 %typemap(in) char **options, char **dict, char **CSL %{ $1 = ($1_ltype)$input; %}
 %typemap(out) char **options, char **dict, char **CSL %{ $result = $1; %}
 %typemap(csin) char **options, char **dict, char **CSL "($csinput != null)? new $modulePINVOKE.StringListMarshal($csinput)._ar : null"
 %typemap(csout, excode=SWIGEXCODE) char**options, char **dict {
         /* %typemap(csout) char**options */
-        IntPtr cPtr = $imcall;
-        IntPtr objPtr;
+       global::System.IntPtr cPtr = $imcall;
+       global::System.IntPtr objPtr;
         int count = 0;
-        if (cPtr != IntPtr.Zero) {
-            while (Marshal.ReadIntPtr(cPtr, count*IntPtr.Size) != IntPtr.Zero)
+        if (cPtr !=global::System.IntPtr.Zero) {
+            while (global::System.Runtime.InteropServices.Marshal.ReadIntPtr(cPtr, count*(global::System.IntPtr.Size)) !=global::System.IntPtr.Zero)
                 ++count;
         }
         string[] ret = new string[count];
         if (count > 0) {
 	        for(int cx = 0; cx < count; cx++) {
-                objPtr = System.Runtime.InteropServices.Marshal.ReadIntPtr(cPtr, cx * System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)));
-                ret[cx]= (objPtr == IntPtr.Zero) ? null : System.Runtime.InteropServices.Marshal.PtrToStringAnsi(objPtr);
+                objPtr = global::System.Runtime.InteropServices.Marshal.ReadIntPtr(cPtr, cx * global::System.Runtime.InteropServices.Marshal.SizeOf(typeof(global::System.IntPtr)));
+                ret[cx]= (objPtr ==global::System.IntPtr.Zero) ? null : global::System.Runtime.InteropServices.Marshal.PtrToStringAnsi(objPtr);
             }
         }
         $excode
@@ -195,51 +195,51 @@ OPTIONAL_POD(int, int);
 
 %typemap(csout, excode=SWIGEXCODE) char** CSL {
         /* %typemap(csout) char** CSL */
-        IntPtr cPtr = $imcall;
-        IntPtr objPtr;
+       global::System.IntPtr cPtr = $imcall;
+       global::System.IntPtr objPtr;
         int count = 0;
-        if (cPtr != IntPtr.Zero) {
-            while (Marshal.ReadIntPtr(cPtr, count*IntPtr.Size) != IntPtr.Zero)
+        if (cPtr !=global::System.IntPtr.Zero) {
+            while (global::System.Runtime.InteropServices.Marshal.ReadIntPtr(cPtr, count*(global::System.IntPtr.Size)) !=global::System.IntPtr.Zero)
                 ++count;
         }
         string[] ret = new string[count];
         if (count > 0) {
 	        for(int cx = 0; cx < count; cx++) {
-                objPtr = System.Runtime.InteropServices.Marshal.ReadIntPtr(cPtr, cx * System.Runtime.InteropServices.Marshal.SizeOf(typeof(IntPtr)));
-                ret[cx]= (objPtr == IntPtr.Zero) ? null : System.Runtime.InteropServices.Marshal.PtrToStringAnsi(objPtr);
+                objPtr = global::System.Runtime.InteropServices.Marshal.ReadIntPtr(cPtr, cx * global::System.Runtime.InteropServices.Marshal.SizeOf(typeof(global::System.IntPtr)));
+                ret[cx]= (objPtr ==global::System.IntPtr.Zero) ? null : global::System.Runtime.InteropServices.Marshal.PtrToStringAnsi(objPtr);
             }
         }
-        if (cPtr != IntPtr.Zero)
+        if (cPtr !=global::System.IntPtr.Zero)
             $modulePINVOKE.StringListDestroy(cPtr);
         $excode
         return ret;
 }
 
-%typemap(imtype, out="IntPtr") int *intList "int[]"
+%typemap(imtype, out="global::System.IntPtr") int *intList "int[]"
 %typemap(cstype) int *intList %{int[]%}
 %typemap(in) int *intList %{ $1 = ($1_ltype)$input; %}
 %typemap(out) int *intList %{ $result = $1; %}
 %typemap(csout, excode=SWIGEXCODE) int *intList {
         /* %typemap(csout) int *intList */
-        IntPtr cPtr = $imcall;
+       global::System.IntPtr cPtr = $imcall;
         int[] ret = new int[count];
         if (count > 0) {
-	        System.Runtime.InteropServices.Marshal.Copy(cPtr, ret, 0, count);
+	        global::System.Runtime.InteropServices.Marshal.Copy(cPtr, ret, 0, count);
         }
         $excode
         return ret;
 }
 
-%typemap(imtype, out="IntPtr") double *doubleList "double[]"
+%typemap(imtype, out="global::System.IntPtr") double *doubleList "double[]"
 %typemap(cstype) double *doubleList %{double[]%}
 %typemap(in) double *doubleList %{ $1 = ($1_ltype)$input; %}
 %typemap(out) double *doubleList %{ $result = $1; %}
 %typemap(csout, excode=SWIGEXCODE) double *doubleList {
         /* %typemap(csout) int *intList */
-        IntPtr cPtr = $imcall;
+       global::System.IntPtr cPtr = $imcall;
         double[] ret = new double[count];
         if (count > 0) {
-	        System.Runtime.InteropServices.Marshal.Copy(cPtr, ret, 0, count);
+	        global::System.Runtime.InteropServices.Marshal.Copy(cPtr, ret, 0, count);
         }
         $excode
         return ret;
@@ -401,14 +401,14 @@ OPTIONAL_POD(int, int);
     return bytes;
   }
 
-  internal static string Utf8BytesToString(IntPtr pNativeData)
+  internal static string Utf8BytesToString(global::System.IntPtr pNativeData)
   {
-    if (pNativeData == IntPtr.Zero)
+    if (pNativeData ==global::System.IntPtr.Zero)
         return null;
 
-    int length = Marshal.PtrToStringAnsi(pNativeData).Length;
+    int length = global::System.Runtime.InteropServices.Marshal.PtrToStringAnsi(pNativeData).Length;
     byte[] strbuf = new byte[length];
-    Marshal.Copy(pNativeData, strbuf, 0, length);
+    global::System.Runtime.InteropServices.Marshal.Copy(pNativeData, strbuf, 0, length);
     return System.Text.Encoding.UTF8.GetString(strbuf);
   }
 %}
@@ -417,11 +417,11 @@ OPTIONAL_POD(int, int);
  * Typemap for const char *utf8_path.
  */
 %typemap(csin) (const char *utf8_path)  "$module.StringToUtf8Bytes($csinput)"
-%typemap(imtype, out="IntPtr") (const char *utf8_path) "byte[]"
+%typemap(imtype, out="global::System.IntPtr") (const char *utf8_path) "byte[]"
 %typemap(out) (const char *utf8_path) %{ $result = $1; %}
 %typemap(csout, excode=SWIGEXCODE) (const char *utf8_path) {
         /* %typemap(csout) (const char *utf8_path) */
-        IntPtr cPtr = $imcall;
+       global::System.IntPtr cPtr = $imcall;
         string ret = $module.Utf8BytesToString(cPtr);
         $excode
         return ret;
@@ -510,13 +510,13 @@ OPTIONAL_POD(int, int);
  * GDAL raster R/W support                                                    *
  *****************************************************************************/
 
-%typemap(imtype, out="IntPtr") void *buffer_ptr "IntPtr"
-%typemap(cstype) void *buffer_ptr %{IntPtr%}
+%typemap(imtype, out="global::System.IntPtr") void *buffer_ptr "global::System.IntPtr"
+%typemap(cstype) void *buffer_ptr %{global::System.IntPtr%}
 %typemap(in) void *buffer_ptr %{ $1 = ($1_ltype)$input; %}
 %typemap(out) void *buffer_ptr %{ $result = $1; %}
 %typemap(csin) void *buffer_ptr "$csinput"
 %typemap(csout, excode=SWIGEXCODE) void *buffer_ptr {
-      IntPtr ret = $imcall;$excode
+     global::System.IntPtr ret = $imcall;$excode
       return ret;
 }
 
@@ -532,7 +532,7 @@ OPTIONAL_POD(int, int);
 /******************************************************************************
  * ErrorHandler callback support                                              *
  *****************************************************************************/
-%pragma(csharp) modulecode="public delegate void GDALErrorHandlerDelegate(int eclass, int code, IntPtr msg);"
+%pragma(csharp) modulecode="public delegate void GDALErrorHandlerDelegate(int eclass, int code,global::System.IntPtr msg);"
 %typemap(imtype) (CPLErrorHandler)  "$module.GDALErrorHandlerDelegate"
 %typemap(cstype) (CPLErrorHandler) "$module.GDALErrorHandlerDelegate"
 %typemap(csin) (CPLErrorHandler)  "$csinput"
@@ -541,7 +541,7 @@ OPTIONAL_POD(int, int);
 /******************************************************************************
  * GDALProgressFunc typemaps                                                  *
  *****************************************************************************/
-%pragma(csharp) modulecode="public delegate int GDALProgressFuncDelegate(double Complete, IntPtr Message, IntPtr Data);"
+%pragma(csharp) modulecode="public delegate int GDALProgressFuncDelegate(double Complete,global::System.IntPtr Message,global::System.IntPtr Data);"
 
 %typemap(imtype) (GDALProgressFunc callback)  "$module.GDALProgressFuncDelegate"
 %typemap(cstype) (GDALProgressFunc callback) "$module.GDALProgressFuncDelegate"
