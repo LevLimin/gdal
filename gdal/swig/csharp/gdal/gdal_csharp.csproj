@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>OSGeo.GDAL</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ogr\ogr_csharp.csproj" />
+    <ProjectReference Include="..\osr\osr_csharp.csproj" />
+  </ItemGroup>
+
+</Project>
